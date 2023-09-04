@@ -1117,6 +1117,8 @@ function main()
 		sampRegisterChatCommand("mh", function() mainWin.v = not mainWin.v end)
 		sampRegisterChatCommand("reload", function() scr:reload() end)
 		sampRegisterChatCommand("hl", funCMD.lec)
+		sampRegisterChatCommand("pilot", funCMD.pilot)
+		sampRegisterChatCommand("healup", funCMD.cure)
 		sampRegisterChatCommand("mc", funCMD.med)
 		sampRegisterChatCommand("narko", funCMD.narko)
 		sampRegisterChatCommand("rec", funCMD.rec)
@@ -4041,6 +4043,103 @@ function funCMD.del()
 	os.remove(scr.path)
 	scr:reload()
 end
+function funCMD.cure(id)
+	if thread:status() ~= "dead" then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return
+	end
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if id:find("%d+") then
+		thread = lua_thread.create(function()			
+			sampSendChat("/todo Ох, очередной бедолага*снимая медицинскую сумку с плеча")
+			wait(2000)
+			sampSendChat("/me ставит медицинскую сумку возле пострадавшего")
+			wait(2000)
+			sampSendChat("/me наклоняется над телом, затем прощупывает пульс на сонной артерии")
+			wait(2000)
+			sampSendChat("/do Пульс отсутствует.")
+			wait(2000)
+			sampSendChat("/me начинает непрямой массаж сердца, время от времени проверяя пульс")
+			wait(2000)
+			sampSendChat("/do Спустя несколько минут сердце пострадавшего началось биться.")
+			wait(100)
+			sampSendChat("/cure "..id..)			
+		end)
+	else
+	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /healup [id игрока].", 0xEE4848)
+	end
+end
+function funCMD.pilot(text)
+	if thread:status() ~= "dead" then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return
+	end
+	---1758.8267822266   -2020.3171386719   1500.7852783203
+	---1785.8004150391   -1995.7534179688   1500.7852783203
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if text:find("(%d+)%s(%d+)") then
+		local id, price = text:match("(%d+)%s(%d+)")
+		thread = lua_thread.create(function()
+			sampSendChat(string.format("Здравствуйте. Я, %s, сотрудник %s, сейчас я проведу вам мед.обследование", u8:decode(buf_nick.v),u8:decode(list_org_en[num_org.v+1])))
+			wait(2000)
+			sampSendChat(string.format("/todo Перед началом хотел%s бы спросить: есть ли жалобы на здоровье?*окидывая взглядом обследуемого",chsex("","а")))
+			wait(1000)
+				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
+				addOneOffSound(0, 0, 0, 1058)
+				local len = renderGetFontDrawTextLength(font, "{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить")
+				while true do
+					wait(0)
+					renderFontDrawText(font, "Осмотр пилота: {8ABCFA}Ответ обследуемого\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
+					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
+				end
+			sampSendChat("/todo Хорошо, снимайте верхнюю одежду и ложитесь на стол*включая кардиограф")
+			wait(2000)
+			sampSendChat("/do Кардиограф включён.")
+			wait(2000)
+			sampSendChat("Сейчас посмотрим, что покажет электрокардиограмма.")
+			wait(2000)
+			sampSendChat(string.format("/me взяв щупы кардиографа в руки, закрепил%s их на торсе обследуемого",chsex("","а")))
+			wait(2000)
+			sampSendChat("/do Щупы закреплены.")
+			wait(2000)
+			sampSendChat("/todo Дышите ровно и глубоко*запустив процесс считывания кардиограммы")
+			wait(2000)
+			sampSendChat("/do Кардиограф издаёт пищание в такт сердцебиения обследуемого.")
+			wait(2000)
+			sampSendChat("/me внимательно наблюдает за показаниями кардиографа")
+			wait(2000)
+			sampSendChat("/do Сердцебиение обследуемого стабильное.")
+			wait(2000)
+			sampSendChat("/do Аппарат начал распечатывать электрокардиограмму.")
+			wait(2000)
+			sampSendChat("/todo Почти закончили*открепив щупы от торса обследуемого")
+			wait(2000)
+			sampSendChat("/do Спустя минуту электрокардиограмма была успешно распечатана.")
+			wait(2000)
+			sampSendChat("/todo Посмотрим, что у нас тут*взяв в руки и изучив результаты электрокардиограммы")
+			wait(2000)
+			sampSendChat(string.format("Как я и думал%s - все показания в пределах нормы!",chsex("","а")))
+			wait(2000)
+			sampSendChat(string.format("/me поставил%s печать в документе №"..id..", взяв штамп больницы с письменного стола",chsex("","а")))
+			wait(2000)
+			sampSendChat("/do Печать больницы проставлена.")
+			wait(2000)
+			sampSendChat("/todo Держите свои результаты!*передавая документ в руки обследуемого")
+			wait(200)
+			sampSendChat("/medcheck "..id.." "..price)
+			wait(2000)
+			sampSendChat("Всего доброго и не болейте!")
+		end)
+	else
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /pilot [id игрока] [цена].", 0xEE4848)
+	end
+end
 function funCMD.lec(id)
 	if thread:status() ~= "dead" then
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
@@ -4693,7 +4792,7 @@ function funCMD.osm()
 				wait(2000)
 				sampSendChat("Можете закрыть рот.")
 				wait(3000)
-				sampSendChat("/me "..chsex("проверил","проверила").." реакция зрачков пациента на свет, посветив в глаза")
+				sampSendChat("/me "..chsex("проверил","проверила").." реакцию зрачков пациента на свет, посветив в глаза")
 				wait(2000)
 				sampSendChat("/do Зрачоки глаз обследуемого сузились.")
 				wait(2000)

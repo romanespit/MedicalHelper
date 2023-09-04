@@ -209,12 +209,12 @@ local num_sex		= imgui.ImInt(0)
 local num_rank	= imgui.ImInt(0)
 local chgName = {}
 chgName.inp = imgui.ImBuffer(100)
-chgName.org = {u8"Больница ЛС", u8"Больница СФ", u8"Больница ЛВ"}
+chgName.org = {u8"Больница ЛС", u8"Больница СФ", u8"Больница ЛВ", u8"Больница Jefferson"}
 chgName.rank = {u8"Интерн", u8"Участковый врач", u8"Терапевт", u8"Нарколог", u8"Окулист", u8"Хирург", u8"Психолог", u8"Завед. отделением", u8"Зам.Гл.Врача", u8"Глав.Врач", u8"Министр Здравоохранения"}
 
-local list_org_BL = {"Больница LS", "Больница SF", "Больница LV"} 
-local list_org	= {u8"Больница ЛС", u8"Больница СФ", u8"Больница ЛВ"}
-local list_org_en = {"Los-Santos Medical Center","San-Fierro Medical Center","Las-Venturas Medical Center"}
+local list_org_BL = {"Больница LS", "Больница SF", "Больница LV", "Больница Jefferson"} 
+local list_org	= {u8"Больница ЛС", u8"Больница СФ", u8"Больница ЛВ", u8"Больница Jefferson"}
+local list_org_en = {"Los-Santos Medical Center","San-Fierro Medical Center","Las-Venturas Medical Center","Jefferson Medical Center"}
 local list_sex	= {fa.ICON_MALE .. u8" Мужской", fa.ICON_FEMALE .. u8" Женский"} --ICON_MALE ICON_FEMALE 
 local list_rank	= {u8"Интерн", u8"Участковый врач", u8"Терапевт", u8"Нарколог", u8"Окулист", u8"Хирург", u8"Психолог", u8"Завед. отделением", u8"Зам.Гл.Врача", u8"Глав.Врач", u8"Министр Здравоохранения"}
 --chat
@@ -854,22 +854,22 @@ function main()
 		else 
 			local textrp = [[
 // Цены на выдачу новой мед.карты
-#med7=10.000$
-#med14=20.000$
-#med30=32.500$
-#med60=65.000$
+#med7=30.000$
+#med14=50.000$
+#med30=70.000$
+#med60=100.000$
 // Цены на обновление мед.карты
-#medup7=15.000$
-#medup14=25.000$
-#medup30=38.000$
-#medup60=70.000$
+#medup7=30.000$
+#medup14=50.000$
+#medup30=70.000$
+#medup60=100.000$
 
 {sleep:0}
 Здравствуйте, Вы хотите получить медицинскую карту впервые или обновить существующую?
 Предоставьте, пожалуйста, Ваш паспорт
 /b /showpass {myID}
 {pause}
-/todo Благодорю вас!*взяв паспорт в руки и {sex:начал|начала} его изучать.
+/todo Благодарю вас!*взяв паспорт в руки и {sex:начал|начала} его изучать.
 {dialog}
 [name]=Выдача мед.карты
 [1]=Новая мед.карта
@@ -877,9 +877,7 @@ function main()
 Для оформления карты необходимо заплатить гос.пошлину, которая зависит от срока карты.
 На 7 дней - #med7, на 14 дней - #med14
 На 30 дней #med30, на 60 дней - #med60.
-Вы согласны?
-Если согласны, то оплатите и мы продолжим процесс оформления.
-/b Оплатить можно через /pay {myID} или /trade {myID}
+Если вы согласны, сообщите, на какой срок вы хотите оформить мед.карту?
 
 {dialog}
 [name]=Срок выдачи
@@ -906,9 +904,7 @@ function main()
 Для обновления данных необходимо заплатить гос.пошлину, которая зависит от срока карты.
 На 7 дней - #medup7, на 14 дней - #medup14
 На 30 дней #medup30, на 60 дней - #medup60.
-Вы согласны?
-Если согласны, то оплатите и мы продолжим процесс оформления.
-/b Оплатить можно через /pay {myID} или /trade {myID}
+Если вы согласны, сообщите, на какой срок вы хотите оформить мед.карту?
 
 {dialog}
 [name]=Срок выдачи
@@ -1026,11 +1022,11 @@ function main()
 				os.remove(dirml.."/MedicalHelper/MainSetting.med")
 				print("{F54A4A}Ошибка. Файл настроек повреждён.")
 				print("{82E28C}Создание новых собственных настроек...")
-				buf_lec.v = "1000"
+				buf_lec.v = "20000"
 				buf_med.v = "3000"
 				buf_upmed.v = "21000"
-				buf_narko.v = "25000"
-				buf_tatu.v = "7000"
+				buf_narko.v = "100000"
+				buf_tatu.v = "75000"
 				buf_rec.v = "1500"
 				
 				buf_time.v = u8"/me посмотрел на часы с гравировкой \"Made in China\""
@@ -1039,11 +1035,11 @@ function main()
 		else
 			print("{F54A4A}Ошибка. Файл настроек не найден.")
 			print("{82E28C}Создание собственных настроек...")
-			buf_lec.v = "1000"
+			buf_lec.v = "20000"
 			buf_med.v = "3000"
 			buf_upmed.v = "21000"
-			buf_narko.v = "25000"
-			buf_tatu.v = "7000"
+			buf_narko.v = "100000"
+			buf_tatu.v = "75000"
 			buf_rec.v = "1500"
 			
 			buf_time.v = u8"/me посмотрел на часы с гравировкой \"Made in China\""
@@ -1137,7 +1133,7 @@ function main()
 		sampRegisterChatCommand("hme", funCMD.hme)
 		sampRegisterChatCommand("sob", funCMD.sob)
 		sampRegisterChatCommand("dep", funCMD.dep)
-		sampRegisterChatCommand("hall*", funCMD.hall)
+		sampRegisterChatCommand("hall", funCMD.hall)
 		sampRegisterChatCommand("update", function() updWin.v = not updWin.v end)
 		sampRegisterChatCommand("post", funCMD.post)
 		sampRegisterChatCommand("ts", funCMD.time)
@@ -2585,7 +2581,7 @@ function imgui.OnDrawFrame()
 					if imgui.BeginPopup("sobEnter") then
 						if imgui.MenuItem(u8"Принять") then lua_thread.create(sobesRP, 4) end
 						if imgui.BeginMenu(u8"Отклонить") then
-							if imgui.MenuItem(u8"Отпечатка в паспорте (Ник)") then lua_thread.create(sobesRP, 5) end
+							if imgui.MenuItem(u8"Опечатка в паспорте (Ник)") then lua_thread.create(sobesRP, 5) end
 							if imgui.MenuItem(u8"Мало лет проживания") then lua_thread.create(sobesRP, 6) end
 							if imgui.MenuItem(u8"Проблемы с законом") then lua_thread.create(sobesRP, 7) end
 							if imgui.MenuItem(u8"Имеет работу") then lua_thread.create(sobesRP, 8) end
@@ -3399,7 +3395,7 @@ function sobesRP(id)
 	end
 	if id == 5 then
 		wait(1000)
-		sampSendChat("Извиняюсь, но у Вас отпечатка в паспорте")
+		sampSendChat("Извиняюсь, но у Вас опечатка в паспорте")
 		wait(1700)
 		sampSendChat("/n НонРП ник или другая причина.")
 		sobes.input.v = ""
@@ -3447,7 +3443,7 @@ function sobesRP(id)
 	end
 	if id == 9 then
 		wait(1000)
-		sampSendChat("Извиняюсь, но Вы состоите в Черном Списке нашей больнице.")
+		sampSendChat("Извиняюсь, но Вы состоите в Черном Списке нашей больницы.")
 		wait(1700)
 		sampSendChat("/n Для вынесения из ЧС требуется оставить заявку на форуме в разделе Мин.Здрав.")
 		sobes.input.v = ""
@@ -4059,7 +4055,7 @@ function funCMD.lec(id)
 	if id:find("%d+") then
 		thread = lua_thread.create(function()
 			if not isCharInModel(PLAYER_PED, 416) then
-				sampSendChat(string.format("Здравствуйте. Я, %s, сотрудник данного медицинского центра, что вас беспокоит?", u8:decode(buf_nick.v)))
+				sampSendChat(string.format("Здравствуйте. Я, %s, сотрудник %s, что вас беспокоит?", u8:decode(buf_nick.v),u8:decode(list_org_en[num_org.v+1])))
 				wait(1000)
 					sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
 					addOneOffSound(0, 0, 0, 1058)
@@ -4069,21 +4065,15 @@ function funCMD.lec(id)
 						renderFontDrawText(font, "Лечение: {8ABCFA}Ответ больного\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
 						if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
 					end
-				sampSendChat(chsex("/me нырнув правой рукой в карман, вытянул оттуда блокнот и ручку", "/me нырнув правой рукой в карман, вытянула оттуда блокнот и ручку"))
+				sampSendChat("Не волнуйтесь, сейчас мы вас подлечим!")
 				wait(2000)
-				sampSendChat(chsex("/todo Хорошо, понял, ничего страшного*записывая в блокнот, все сказанное пациентом", "/todo Хорошо, поняла, ничего страшного*записывая в блокнот, все сказанное пациентом"))
+				sampSendChat("/do В правой руке мед. кейс.")
 				wait(2000)
-				sampSendChat("/do Открытая сумка весит на плече правой руки.")
-				wait(2000)
-				sampSendChat(chsex("/me несколькими движениями нащупал лекарство", "/me несколькими движениями нащупала лекарство"))
-				wait(2000)
-				sampSendChat("/do Лекарство в левой руке.")
-				wait(2000)
-				sampSendChat("/todo Вот, держите*передавая лекарство человеку напротив")
+				sampSendChat(chsex("/me открыв медицинский кейс, вытащил лекарство и передал пациенту", "/me открыв медицинский кейс, вытащила лекарство и передала пациенту"))
 				wait(2000)
 				sampSendChat("Принимайте эти таблетки, и через некоторое время вам станет лучше")
 				wait(100)
-				sampSendChat("/heal "..id)
+				sampSendChat("/heal "..id.." "..buf_lec.v)
 			elseif isCharInModel(PLAYER_PED, 416) then
 				sampSendChat("Здравствуйте, что с Вами случилось?")
 				wait(2000)
@@ -4093,7 +4083,7 @@ function funCMD.lec(id)
 				wait(2000)
 				sampSendChat(chsex("/me протянул лекарство человеку", "/me протянула лекарство человеку"))
 				wait(100)
-				sampSendChat("/heal "..id)
+				sampSendChat("/heal "..id.." "..buf_lec.v)
 			end
 		end)
 	else
@@ -4256,7 +4246,7 @@ function funCMD.narko(id)
 	end
 		if id:find("(%d+)") then
 			thread = lua_thread.create(function()
-				sampSendChat(string.format("Здравствуйте. Я, %s, сотрудник данного медицинского центра.", u8:decode(buf_nick.v)))
+				sampSendChat(string.format("Здравствуйте. Я, %s, сотрудник %s.", u8:decode(buf_nick.v),u8:decode(list_org_en[num_org.v+1])))
 				wait(2000)
 				sampSendChat("Я, смотрю, Вы решили излечиться от наркозависимости, это хорошо")
 				wait(2000)
@@ -4332,7 +4322,7 @@ function funCMD.rec(id)
 						if isKeyJustPressed(VK_5) and not sampIsChatInputActive() and not sampIsDialogActive() then countRec =5; break end
 					end
 				wait(200)
-				sampSendChat("/do На плече весит мед. сумка.")
+				sampSendChat("/do На плече висит мед. сумка.")
 				wait(1700)
 				sampSendChat("/me снял".. chsex("", "а") .." мед. сумку с плеча, после чего открыл".. chsex("", "а") .." ее")
 				wait(2000)
@@ -4342,7 +4332,7 @@ function funCMD.rec(id)
 				wait(2000)
 				sampSendChat("/do Бланки заполнены.")
 				wait(2000)
-				sampSendChat("/me поставил".. chsex("", "а") .." печать "..u8:decode(chgName.org[num_org.v+1]))
+				sampSendChat("/me поставил".. chsex("", "а") .." печать "..u8:decode(list_org_en[num_org.v+1]))
 				wait(2000)
 				sampSendChat("/me "..chsex("оформил","оформила").." рецепт")
 				wait(2000)
@@ -4551,7 +4541,7 @@ function funCMD.mute(text)
 		if text:find("(%d+)%s(%d+)%s(%X+)") then
 		local id, timem, reac = text:match("(%d+)%s(%d+)%s(%X+)")
 		thread = lua_thread.create(function()
-					sampSendChat("/do Рация весит на поясе.")
+					sampSendChat("/do Рация висит на поясе.")
 					wait(2000)		
 					sampSendChat("/me снял".. chsex("", "а") .." рацию с пояса")
 					wait(2000)
@@ -4563,7 +4553,7 @@ function funCMD.mute(text)
 					wait(2000)
 					sampSendChat("/r Сотруднику с бейджиком №"..id.." была отключена рация по причине: "..reac)
 					wait(2000)		
-					sampSendChat("/me повесил".. chsex("", "а") .." обратно рация на пояс")
+					sampSendChat("/me повесил".. chsex("", "а") .." обратно рацию на пояс")
 			end)
 		else
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /+mute [id игрока] [время в минутах] [причина].", 0xEE4848)
@@ -4580,7 +4570,7 @@ function funCMD.umute(id)
 	end
 		if id:find("(%d+)") then
 		thread = lua_thread.create(function()
-					sampSendChat("/do Рация весит на поясе.")
+					sampSendChat("/do Рация висит на поясе.")
 					wait(2000)		
 					sampSendChat("/me снял рацию с пояса")
 					wait(2000)
@@ -4650,7 +4640,7 @@ function funCMD.osm()
 						if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
 					end
 					
-				sampSendChat("/me "..chsex("взял","взяла").." мед.карту из рук человек")
+				sampSendChat("/me "..chsex("взял","взяла").." мед.карту из рук человека")
 				wait(2000)
 				sampSendChat("/do Мед.карта в руках. ")
 				wait(2000)
@@ -4733,7 +4723,7 @@ function funCMD.hall()
 			local pxp, pyp, pzp = getCharCoordinates(handle)
 			local distance = getDistanceBetweenCoords2d(px, py, pxp, pyp)
 			if distance <= 4 then
-				sampSendChat("/heal "..i)
+				sampSendChat("/heal "..i.." "..buf_lec.v)
 			end
 		end
 	end
@@ -4750,7 +4740,7 @@ function funCMD.dep()
 end
 function funCMD.hme()
 	local _, plId = sampGetPlayerIdByCharHandle(PLAYER_PED)
-	sampSendChat("/heal "..plId)
+	sampSendChat("/heal "..plId.." 5000")
 end
 function funCMD.memb()
 	sampSendChat("/members")

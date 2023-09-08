@@ -606,10 +606,10 @@ cmdBind = {
 		rb = false
 	},
 	[10] = {
-		cmd = "/osm",
+		cmd = "/pilot",
 		key = {},
-		desc = "Произвести медицинский осмотр",
-		rank = 5,
+		desc = "Произвести медицинский осмотр пилота",
+		rank = 4,
 		rb = false
 	},
 	[11] = {
@@ -846,6 +846,45 @@ function main()
 		if doesDirectoryExist(dirml.."/MedicalHelper/Департамент/") then
 			getGovFile()
 		end
+		if doesFileExist(dirml.."/MedicalHelper/rp-antibiotik.txt") then
+			local f = io.open(dirml.."/MedicalHelper/rp-antibiotik.txt")
+			buf_mcedit.v =  u8(f:read("*a"))
+			f:close()
+			print("{82E28C}Чтение отыгровки антибиотиков...")
+		else 
+			local textrp = [[
+{sleep:0}
+Насколько я понял{sex:|а}, вы хотите приобрести антибиотики.
+Стоимость одного антибиотика составляет 40.000$. Вы согласны?
+Если да, то какое количество Вам необходимо?
+{pause}
+/me открыв мед.сумку, взял{sex:|а} пачку антибиотиков
+/me достал{sex:|а} из нагрудного кармана блокнотик и шариковую ручку
+/me написал{sex:|а} рекомендации по употреблению и протянул{sex:|а} листочек человеку напротив
+/todo Вот держите, употребляйте их строго по моим рекомендациям!*закрывая мед. сумку
+/antibiotik #playerID]]  
+			local f = io.open(dirml.."/MedicalHelper/rp-receptheal.txt", "w")
+			f:write(textrp) 
+			f:close()
+		end
+		if doesFileExist(dirml.."/MedicalHelper/rp-receptheal.txt") then
+			local f = io.open(dirml.."/MedicalHelper/rp-receptheal.txt")
+			buf_mcedit.v =  u8(f:read("*a"))
+			f:close()
+			print("{82E28C}Чтение отыгровки рецепта и хила...")
+		else 
+			local textrp = [[
+{sleep:0}
+/b Купи рецепт, для квеста надо, если что выкинешь в мусорку у больницы. Хильну дешево
+/recept #playerID 1
+{pause}
+/me достал{sex:|а} из мед. сумки таблетку
+/todo Вот, выпейте, должно полегчать*передавая таблетку человеку напротив
+/heal #playerID 10000]]  
+			local f = io.open(dirml.."/MedicalHelper/rp-receptheal.txt", "w")
+			f:write(textrp) 
+			f:close()
+		end
 		if doesFileExist(dirml.."/MedicalHelper/rp-medcard.txt") then
 			local f = io.open(dirml.."/MedicalHelper/rp-medcard.txt")
 			buf_mcedit.v =  u8(f:read("*a"))
@@ -853,79 +892,52 @@ function main()
 			print("{82E28C}Чтение отыгровки мед.карты...")
 		else 
 			local textrp = [[
-// Цены на выдачу новой мед.карты
+// Цены на мед карту
 #med7=30.000$
 #med14=50.000$
 #med30=70.000$
 #med60=100.000$
-// Цены на обновление мед.карты
-#medup7=30.000$
-#medup14=50.000$
-#medup30=70.000$
-#medup60=100.000$
 
 {sleep:0}
-Здравствуйте, Вы хотите получить медицинскую карту впервые или обновить существующую?
+Здравствуйте, как я понял{sex:|а} Вы хотите получить медицинскую карту.
 Предоставьте, пожалуйста, Ваш паспорт
 /b /showpass {myID}
 {pause}
-/todo Благодарю вас!*взяв паспорт в руки и {sex:начал|начала} его изучать.
-{dialog}
-[name]=Выдача мед.карты
-[1]=Новая мед.карта
-Хорошо, я Вас {sex:понял|поняла}. Вам нужно оформить новую мед.карту.
+/todo Благодарю вас!*взяв паспорт в руки и начав его изучать.
 Для оформления карты необходимо заплатить гос.пошлину, которая зависит от срока карты.
 На 7 дней - #med7, на 14 дней - #med14
-На 30 дней #med30, на 60 дней - #med60.
+На 30 дней - #med30, на 60 дней - #med60.
+/b До 4-го лвл медкарта на 7 дней выдаётся за 1000$
 Если вы согласны, сообщите, на какой срок вы хотите оформить мед.карту?
-
 {dialog}
 [name]=Срок выдачи
 [1]=7 дней
 #timeID=0
+{dialog}
+[name]=ЛВЛ пациента
+[1]=До 4
+#price=1000
+Я вас понял{sex:|а}. Для вас мед. карта на 7 дней будет стоить - 1000$
+[2]=5+ лвл
+#price=30000
+{dialogEnd}
 [2]=14 дней
 #timeID=1
+#price=50000
 [3]=30 дней
 #timeID=2
-[4]=60 дей
+#price=70000
+[4]=60 дней
 #timeID=3
+#price=100000
 {dialogEnd}
-
 Хорошо, тогда приступим к оформлению.
 /me {sex:вытащил|вытащила} из нагрудного кармана шариковую ручку
 /do Ручка в правой руке.
-/me открыл{sex:|а} шкафчик, затем достал{sex:|а} оттуда пустые бланки для мед.карты
+/me достал{sex:|а} из мед. сумки пустой бланк для мед.карты
 /me разложил{sex:|а} пальцами правой руки паспорт на нужной страничке и начал{sex:|а} переписывать данные в бланк
 /me открыл{sex:|а} пустую мед.карту и паспорт, затем начал{sex:|а} переписывать данные из паспорта
 /do Спустя минуту данные паспорта были переписаны на бланк.
-
-[2]=Обновление данных
-Хорошо, я Вас понял{sex:|а}. Вам нужно обновить данные в мед.карте.
-Для обновления данных необходимо заплатить гос.пошлину, которая зависит от срока карты.
-На 7 дней - #medup7, на 14 дней - #medup14
-На 30 дней #medup30, на 60 дней - #medup60.
-Если вы согласны, сообщите, на какой срок вы хотите оформить мед.карту?
-
-{dialog}
-[name]=Срок выдачи
-[1]=7 дней
-#timeID=0
-[2]=14 дней
-#timeID=1
-[3]=30 дней
-#timeID=2
-[4]=60 дей
-#timeID=3
-{dialogEnd}
-
-Хорошо, тогда приступим к оформлению.
-/me вытащил{sex:|а} из нагрудного кармана шариковую ручку
-/do Ручка в правой руке.
-/me открыл{sex:|а} шкафчик, затем начал{sex:|а} искать мед.карту c индификатором №#playerID
-/me разложил{sex:|а} пальцами правой руки паспорт на нужной страничке и начал переписывать данные в бланк
-/me открыл{sex:|а} пустую мед.карту и паспорт, затем начал переписывать данные из паспорта
-/do Спустя минуту данные паспорта были переписаны на бланк.
-{dialogEnd}
 /me отложил{sex:|а} паспорт в сторону его хозяина и приготовил{sex:ся|ась} к продолжению занесения информации
 Так, сейчас задам несколько вопросов касаемо здоровья...
 Жалобы на здоровье имеются?
@@ -941,14 +953,8 @@ function main()
 Как вы просыпаетесь утром, какое у вас настроение?
 [3]=Приступы бесконтрольного смеха.
 Бывают ли у вас бесконтрольные приступы смеха? Если да, то как часто?
-[4]=Ситуация на дороге.
-Представьте, что Вы находитесь в центре дороги и на вас едет с...
-...большой скоростью массивное авто.
-Что вы сделаете?
-[5]=Приступы агрессии.
+[4]=Приступы агрессии.
 Бывают ли у вас бесконтрольные приступы агрессии? Если да, то как часто?
-[6]=Лежащий на земле
-Что вы будете делать, если Вы увидели человека лежащего на земле?
 {dialogEnd}
 {pause}
 /me записал{sex:|а} все сказанное пациентом в мед.карту
@@ -956,21 +962,21 @@ function main()
 [name]=Сост. здоровья
 [1]=Полноcтью здоров(ая)
 #healID=3
-/me сделал{sex:|а} запись напротив пункта 'Псих. Здоровье.' - 'Полностью здоров(а).'
-[2]=Наблюдаются отклоненияются
+/me сделал{sex:|а} запись в мед. карте - «Полностью здоров(а).»
+[2]=Наблюдаются отклонения
 #healID=2
-/me сделал{sex:|а} запись напротив пункта 'Псих. Здоровье.' - 'Имеются отклонения.'
+/me сделал{sex:|а} запись в мед. карте - «Имеются отклонения.»
 [3]=Психически не здоров(ая)
 #healID=1
-/me сделал{sex:|а} запись напротив пункта 'Псих. Здоровье.' - 'Псих. нездоров.'
+/me сделал{sex:|а} запись в мед. карте - «Псих. нездоров.»
 {dialogEnd}
-/me взял{sex:|а} штамп {myHospEn} в правую руку из ящика стола и нанес{sex:|ла} оттиск в углу бланка
+/me взял{sex:|а} штамп «{myHospEn}» в правую руку из ящика стола и нанес{sex:|ла} оттиск в углу бланка
 /do Печать нанесена.
 /me отложив штамп в сторону и поставил{sex:|а} свою подпись, и сегодняшнюю дату
 /do Страница мед.карты заполнена.
 Всё готово, держите свою мед.карту, не болейте.
 Удачного дня.
-/medcard #playerID #healID #timeID 1000]]  
+/medcard #playerID #healID #timeID #price]]  
 			local f = io.open(dirml.."/MedicalHelper/rp-medcard.txt", "w")
 			f:write(textrp) 
 			f:close()
@@ -1071,12 +1077,12 @@ function main()
 			end
 		else
 			print("{F54A4A}Ошибка. Файл настроек команд повреждён.")
-			print("{82E28C}Применины стандартные настройки")
+			print("{82E28C}Применены стандартные настройки")
 			os.remove(dirml.."/MedicalHelper/cmdSetting.med")
 		end
 	else
 		print("{F54A4A}Ошибка. Файл настроек команд не найден.")
-		print("{82E28C}Применины стандартные настройки")
+		print("{82E28C}Применены стандартные настройки")
 	end
 	
 	--register binder 
@@ -1098,11 +1104,11 @@ function main()
 		else
 			os.remove(dirml.."/MedicalHelper/bindSetting.med")
 			print("{F54A4A}Ошибка. Файл настроек биндера повреждён.")
-			print("{82E28C}Применины стандартные настройки")
+			print("{82E28C}Применены стандартные настройки")
 		end
 	else 
 		print("{F54A4A}Ошибка. Файл настроек биндера не найден.")
-		print("{82E28C}Применины стандартные настройки")
+		print("{82E28C}Применены стандартные настройки")
 	end
 	
 	lockPlayerControl(false)
@@ -1117,6 +1123,9 @@ function main()
 		sampRegisterChatCommand("mh", function() mainWin.v = not mainWin.v end)
 		sampRegisterChatCommand("reload", function() scr:reload() end)
 		sampRegisterChatCommand("hl", funCMD.lec)
+		sampRegisterChatCommand("hlf", funCMD.lecFast)
+		sampRegisterChatCommand("antib", funCMD.antibiotik)
+		sampRegisterChatCommand("hlrec", funCMD.lecRecept)
 		sampRegisterChatCommand("pilot", funCMD.pilot)
 		sampRegisterChatCommand("healup", funCMD.cure)
 		sampRegisterChatCommand("mc", funCMD.med)
@@ -4043,6 +4052,7 @@ function funCMD.del()
 	os.remove(scr.path)
 	scr:reload()
 end
+
 function funCMD.cure(id)
 	if thread:status() ~= "dead" then
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
@@ -4066,7 +4076,7 @@ function funCMD.cure(id)
 			wait(2000)
 			sampSendChat("/do Спустя несколько минут сердце пострадавшего началось биться.")
 			wait(100)
-			sampSendChat("/cure "..id..)			
+			sampSendChat("/cure "..id)			
 		end)
 	else
 	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /healup [id игрока].", 0xEE4848)
@@ -4095,11 +4105,21 @@ function funCMD.pilot(text)
 				local len = renderGetFontDrawTextLength(font, "{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить")
 				while true do
 					wait(0)
-					renderFontDrawText(font, "Осмотр пилота: {8ABCFA}Ответ обследуемого\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
+					renderFontDrawText(font, "Осмотр пилота: {8ABCFA}Ответ\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
 					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
 				end
 			sampSendChat("/todo Хорошо, снимайте верхнюю одежду и ложитесь на стол*включая кардиограф")
-			wait(2000)
+			wait(200)
+			sampSendChat("/medcheck "..id.." "..price)
+			wait(1000)
+				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
+				addOneOffSound(0, 0, 0, 1058)
+				local len = renderGetFontDrawTextLength(font, "{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить")
+				while true do
+					wait(0)
+					renderFontDrawText(font, "Осмотр пилота: {8ABCFA}Оплата\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
+					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
+				end
 			sampSendChat("/do Кардиограф включён.")
 			wait(2000)
 			sampSendChat("Сейчас посмотрим, что покажет электрокардиограмма.")
@@ -4131,14 +4151,59 @@ function funCMD.pilot(text)
 			sampSendChat("/do Печать больницы проставлена.")
 			wait(2000)
 			sampSendChat("/todo Держите свои результаты!*передавая документ в руки обследуемого")
-			wait(200)
-			sampSendChat("/medcheck "..id.." "..price)
 			wait(2000)
 			sampSendChat("Всего доброго и не болейте!")
 		end)
 	else
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /pilot [id игрока] [цена].", 0xEE4848)
 	end
+end
+function funCMD.lecFast(id)
+	if thread:status() ~= "dead" then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return
+	end
+	---1758.8267822266   -2020.3171386719   1500.7852783203
+	---1785.8004150391   -1995.7534179688   1500.7852783203
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if id:find("%d+") then
+		thread = lua_thread.create(function()
+			sampSendChat(string.format("/me достал%s из мед. сумки таблетку",chsex("","а")))
+			wait(1000)
+			sampSendChat("/todo Вот, выпейте, должно полегчать*передавая таблетку человеку напротив")
+			wait(100)
+			sampSendChat("/heal "..id.." "..buf_lec.v)
+		end)
+	else
+	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /hlf [id игрока].", 0xEE4848)
+	end
+end
+function funCMD.antibiotik(id)
+	if thread:status() ~= "dead" then 
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return 
+	end
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if id:find("%d+") then
+		local id = id:match("(%d+)")
+	thread = lua_thread.create(function()
+		local dir = dirml.."/MedicalHelper/rp-antibiotik.txt"	
+		local tb = {}
+		tb = strBinderTable(dir)
+		tb.sleep = 1.85
+		tb.vars["playerID"] = id
+		playBind(tb)		
+	end)
+	else
+	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду: /antib [id игрока].", 0xEE4848)
+	end
+
 end
 function funCMD.lec(id)
 	if thread:status() ~= "dead" then
@@ -4189,6 +4254,30 @@ function funCMD.lec(id)
 	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /hl [id игрока].", 0xEE4848)
 	end
 end
+function funCMD.lecRecept(id)
+	if thread:status() ~= "dead" then 
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return 
+	end
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if id:find("%d+") then
+		local id = id:match("(%d+)")
+	thread = lua_thread.create(function()
+		local dir = dirml.."/MedicalHelper/rp-receptheal.txt"	
+		local tb = {}
+		tb = strBinderTable(dir)
+		tb.sleep = 1.85
+		tb.vars["playerID"] = id
+		playBind(tb)		
+	end)
+	else
+	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду: /hlrec [id игрока].", 0xEE4848)
+	end
+
+end
 function funCMD.med(id)
 	if thread:status() ~= "dead" then 
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
@@ -4201,131 +4290,6 @@ function funCMD.med(id)
 	if id:find("%d+") then
 		local id = id:match("(%d+)")
 	thread = lua_thread.create(function()
-		--[[
-			sampSendChat("Здравствуйте, Вы желаете получить медицинскую карту?")
-			wait(3000)
-			sampSendChat("Предоставьте пожалуйста Ваш паспорт для определения требований.")		
-			
-				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на цифру верхней панели для выбора вида мед.услуги.", 0xEE4848)
-				addOneOffSound(0, 0, 0, 1058)
-				while true do
-					wait(0)
-					renderFontDrawText(font, "Выдача мед.карты: \n{FFFFFF}[{67E56F}1{FFFFFF}] - Выдача новой\n[{67E56F}2{FFFFFF}] - Обновление", sx/5*4, sy-100, 0xFFFFFFFF)
-					if isKeyJustPressed(VK_1) and not sampIsChatInputActive() and not sampIsDialogActive() then 
-						sampSendChat("Хорошо, я Вас "..chsex("понял","поняла")..". Вам нужно оформить новую мед.карту.")
-						wait(2200)
-						sampSendChat("Для оформления карты необходимо заплатить гос.пошлину в размере "..buf_med.v.."$, после чего мы продолжим.")
-						wait(2000)
-						sampSendChat("/n Оплатите с помощью команды /pay или /trade")
-						break 
-					end
-					if isKeyJustPressed(VK_2) and not sampIsChatInputActive() and not sampIsDialogActive() then 
-						sampSendChat("Хорошо, я Вас "..chsex("понял","поняла")..". Вам нужно обновить данные в мед.карте.")
-						wait(2200)
-						sampSendChat("Для обновления карты необходимо заплатить гос.пошлину в размере "..buf_upmed.v.."$, после чего мы продолжим.")
-						wait(2000)
-						sampSendChat("/n Оплатите с помощью команды /pay или /trade")
-						break 
-					end
-				end
-			sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
-			addOneOffSound(0, 0, 0, 1058)
-			while true do
-				wait(0)
-				renderFontDrawText(font, "Выдача мед.карты: {8ABCFA}Оплата услуги\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx/5*4, sy-50, 0xFFFFFFFF)
-				if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
-			end
-				sampSendChat("/todo Благодарю, Вас*взяв паспорт в левую руку")
-				wait(1750)
-				sampSendChat("/do Паспорт в левой руке.")
-				wait(1750)
-				sampSendChat("Не волнуйтесь, скоро я его Вам отдам!")
-				wait(1750)
-				sampSendChat(chsex("/me положил паспорт на стол", "/me положила паспорт на стол"))
-				wait(1750)
-				sampSendChat("/do Паспорт лежит на столе.")
-				wait(1750)
-				sampSendChat(chsex("/me подошел к столу и сел на стул", "/me подошла к столу и села на стул"))
-				wait(1750)
-				sampSendChat(chsex("/me пододвинул правой рукой паспорт к себе и открыл его", "/me пододвинула правой рукой паспорт к себе и открыла его"))
-				wait(1750)
-				sampSendChat("/do Паспорт открыт.")
-				wait(1750)
-				sampSendChat("/do Ручка лежит в правом кармане.")
-				wait(1750)
-				sampSendChat(chsex("/me плавным движением левой руки вытащил ручку из кармана", "/me плавным движением левой руки вытащила ручку из кармана"))
-				wait(1750)
-				sampSendChat("/do Ручка в левой руке.")
-				wait(1750)
-				sampSendChat("/do Чистые бланки для заполнения лежат на столе.")
-				wait(1750)
-				sampSendChat(chsex("/me плавным движением правой руки пододвинул чистые бланки к себе", "/me плавным движением правой руки пододвинула чистые бланки к себе"))
-				wait(1750)
-				sampSendChat(chsex("/me начал переписывать данные с паспорта на бланки", "/me начала переписывать данные с паспорта на бланки"))
-				wait(1750)
-				sampSendChat("/do Данные с паспорта переписаны на бланки.")
-				wait(1750)
-				sampSendChat("Жалобы на здоровье есть?")
-				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
-				addOneOffSound(0, 0, 0, 1058)
-				while true do
-					wait(0)
-					renderFontDrawText(font, "Выдача мед.карты: {8ABCFA}Здоровье\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx/5*4, sy-50, 0xFFFFFFFF)
-					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
-				end
-				sampSendChat(chsex("/me записал в бланк", "/me записала в бланк"))
-				wait(1700)
-				sampSendChat("Хорошо, теперь маленький тест на психику.")
-				wait(1700)
-				
-				local test = {
-				[1] = "Представим ситуацию, Вы шли по улице и увидели, как горит дом. Ваши действия?",
-				[2] = "Что вы будете делать, если Вы увидели человека лежащего на земле?",
-				[3] = "Ваши действия, если Вы увидели бомбу на дороге?"
-				}
-				math.randomseed(os.time())
-				local idp = math.random(1, 3)
-				sampSendChat(test[idp])
-				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на цифру верхней панели после ответа пациента.", 0xEE4848)
-				addOneOffSound(0, 0, 0, 1058)
-				local diag = 0
-				local time = 0
-				while true do
-					wait(0)
-					renderFontDrawText(font, "Выдача мед.карты: {8ABCFA}Псих. состояние\n{FFFFFF}[{67E56F}1{FFFFFF}] - Здоровый\n[{67E56F}2{FFFFFF}] - Имеются отклонения\n[{67E56F}3{FFFFFF}] - Псих. нездоров", sx/5*4, sy-100, 0xFFFFFFFF)
-					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
-					if isKeyJustPressed(VK_1) and not sampIsChatInputActive() and not sampIsDialogActive() then diag = 3; break end
-					if isKeyJustPressed(VK_2) and not sampIsChatInputActive() and not sampIsDialogActive() then diag = 2; break end
-					if isKeyJustPressed(VK_3) and not sampIsChatInputActive() and not sampIsDialogActive() then diag = 1; break end
-				end 
-				wait(200)
-				while true do
-					wait(0)
-					renderFontDrawText(font, "Выдача мед.карты: {8ABCFA}Срок мед.карты\n{FFFFFF}[{67E56F}1{FFFFFF}] - 7 дней\n[{67E56F}2{FFFFFF}] - 14 днй\n[{67E56F}3{FFFFFF}] - 30 дней\n[{67E56F}4{FFFFFF}] - 60 не", sx/5*4, sy-120, 0xFFFFFFFF)
-					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
-					if isKeyJustPressed(VK_1) and not sampIsChatInputActive() and not sampIsDialogActive() then time = 0; break end
-					if isKeyJustPressed(VK_2) and not sampIsChatInputActive() and not sampIsDialogActive() then time = 1; break end
-					if isKeyJustPressed(VK_3) and not sampIsChatInputActive() and not sampIsDialogActive() then time = 2; break end
-					if isKeyJustPressed(VK_4) and not sampIsChatInputActive() and not sampIsDialogActive() then time = 3; break end
-				end
-					wait(1700)
-						if diag == 3 then
-							sampSendChat(chsex("/me поставил печать 'Полноcтью здоров(ая)'", "/me поставила печать 'Полноcтью здоров(ая)'"))
-						elseif diag == 2 then
-							sampSendChat(chsex("/me поставил печать 'Наблюдаются отклонения'", "/me поставила печать 'Наблюдаются отклонения'"))
-						elseif diag == 1 then
-							sampSendChat(chsex("/me поставил печать 'Психически не здоров(ая)'", "/me поставила печать 'Психически не здоров(ая)'"))
-						end
-					wait(1700)
-					sampSendChat(chsex("/me взял в левую руку мед. карту, а паспорт в правую", "/me взяла в левую руку мед.карту, а паспорт в правую"))
-					wait(1700)
-					sampSendChat("/do Мед.карта и паспорт в руках.")
-					wait(1700)
-					sampSendChat("/todo Не болейте, всего доброго*передавая мед.карту и паспорт")
-					wait(500)
-					sampSendChat("/medcard "..id.." "..diag.." "..time)
-					statusMed = 0
-		]]	
 		local dir = dirml.."/MedicalHelper/rp-medcard.txt"	
 		local tb = {}
 		tb = strBinderTable(dir)
@@ -4352,14 +4316,15 @@ function funCMD.narko(id)
 				sampSendChat("Стоимость сеанса составляет "..buf_narko.v.."$, Вы согласны?")
 				wait(2000)
 				sampSendChat("/n Оплачивать не требуется, сервер сам предложит")
-				wait(500)
+				wait(2000)			
+				sampSendChat("Если Вы согласны, садитесь на кушетку и закатайте рукав")
+				wait(500)	
 				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
 					while true do
 					wait(0)
 						renderFontDrawText(font, "Лечение наркозав-ти: {8ABCFA}Соглашение\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx/5*4, sy-50, 0xFFFFFFFF)
 						if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
-					end				
-				sampSendChat("Если Вы согласны, садитесь на кушетку и закатайте рукав")
+					end	
 				wait(2000)
 				sampSendChat("/do На столе лежит ватка, жгут и шприц с вакциной.")
 				wait(2000)
@@ -4375,7 +4340,7 @@ function funCMD.narko(id)
 				wait(2000)
 				sampSendChat("/me протёр".. chsex("","ла") .." ваткой локтевой изгиб")
 				wait(2000)
-				sampSendChat("/todo Не волнуйтесь,будет не больно*".. chsex("взял", "взяла") .." со стола шприц с вакциной")
+				sampSendChat("/todo Не волнуйтесь, будет не больно*взяв со стола шприц с вакциной")
 				wait(2000)
 				sampSendChat("/me плавным движением правой руки делает укол")
 				wait(2000)
@@ -4407,7 +4372,7 @@ function funCMD.rec(id)
 				wait(2000)
 				sampSendChat("Скажите сколько Вам требуется рецептов, после чего мы продолжим.")
 				wait(2000)
-				sampSendChat("/n Внимание! В течении часа выдаётся максимум 5 рецептов на руки.")
+				sampSendChat("/b Внимание! В течении часа выдаётся максимум 5 рецептов на руки.")
 				wait(500)
 				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на цифру верхней цифровой панели равная количеству выдаваемых рецептов.", 0xEE4848)
 				local len = renderGetFontDrawTextLength(font, "Выдача рецептов: {8ABCFA}Выбор кол-ва")
@@ -4499,7 +4464,7 @@ function funCMD.tatu(id)
 				wait(2000)
 				sampSendChat("Стоимость выведения татуировки составит "..buf_tatu.v.."$, Вы согласны?")
 				wait(2000)
-				sampSendChat("/n Оплачивать не требуется, сервер сам предложит")
+				sampSendChat("/b Оплачивать не требуется, сервер сам предложит")
 				wait(2000)
 				sampSendChat("/b Покажите татуировки с помощью команды /showtatu")
 					sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения или {23E64A}Page Down{FFFFFF}, чтобы закончить диалог.", 0xEE4848)

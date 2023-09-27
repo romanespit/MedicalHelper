@@ -469,7 +469,7 @@ lua_thread.create(function()
 end)
 --Xyinya
 local week = {"Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}
-local month = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"}
+local month = {"января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"}
 editKey = false
 keysList = {}
 arep = false
@@ -693,7 +693,28 @@ cmdBind = {
 		cmd = "/exp",
 		key = {},
 		desc = "Исключение игрока из помещения больницы",
-		rank = 5,
+		rank = 3,
+		rb = false
+	},
+	[23] = {
+		cmd = "/antib",
+		key = {},
+		desc = "Продажа антибиотиков",
+		rank = 3,
+		rb = false
+	},
+	[24] = {
+		cmd = "/hlf",
+		key = {},
+		desc = "Быстрая отыгровка лечения",
+		rank = 3,
+		rb = false
+	},
+	[24] = {
+		cmd = "/hldecline",
+		key = {},
+		desc = "Отказ в лечении",
+		rank = 3,
 		rb = false
 	}
 }
@@ -1124,11 +1145,13 @@ function main()
 		sampRegisterChatCommand("reload", function() scr:reload() end)
 		sampRegisterChatCommand("hl", funCMD.lec)
 		sampRegisterChatCommand("hlf", funCMD.lecFast)
+		sampRegisterChatCommand("hldecline", funCMD.lecDecline)
 		sampRegisterChatCommand("antib", funCMD.antibiotik)
 		sampRegisterChatCommand("hlrec", funCMD.lecRecept)
 		sampRegisterChatCommand("pilot", funCMD.pilot)
 		sampRegisterChatCommand("healup", funCMD.cure)
 		sampRegisterChatCommand("mc", funCMD.med)
+		sampRegisterChatCommand("fmc", funCMD.medFast)
 		sampRegisterChatCommand("narko", funCMD.narko)
 		sampRegisterChatCommand("rec", funCMD.rec)
 		sampRegisterChatCommand("tatu", funCMD.tatu)
@@ -4156,6 +4179,67 @@ function funCMD.pilot(text)
 		end)
 	else
 		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /pilot [id игрока] [цена].", 0xEE4848)
+	end
+end
+function funCMD.lecDecline(reason)
+	if thread:status() ~= "dead" then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return
+	end
+	---1758.8267822266   -2020.3171386719   1500.7852783203
+	---1785.8004150391   -1995.7534179688   1500.7852783203
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end		 
+	thread = lua_thread.create(function()
+		sampSendChat(string.format("Уважаемый пациент, вынужден%s отказать вам в платном лечении.",chsex("","а")))
+		wait(1000)
+		sampSendChat("Вы можете долечиться бесплатно, полежав некоторое время на койке в палате.")
+		wait(1000)
+		sampSendChat("Впредь будьте внимательнее и не нарушайте правила больницы.")
+		if reason:find("%d+") and reason == tostring(1) then
+			wait(1000)
+			sampSendChat("/b Лечить по просьбе 'Фаст' или 'Без бинда' мы не можем.")
+		end
+	end)
+end
+function funCMD.medFast(id)
+	if thread:status() ~= "dead" then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: В данный момент проигрывается отыгровка.", 0xEE4848)
+		return
+	end
+	---1758.8267822266   -2020.3171386719   1500.7852783203
+	---1785.8004150391   -1995.7534179688   1500.7852783203
+	if not u8:decode(buf_nick.v):find("[а-яА-Я]+%s[а-яА-Я]+") then
+		sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Подождите-ка, сначала нужно заполнить базовую информацию. {90E04E}/mh > Настройки > Основная информация", 0xEE4848)
+		return
+	end
+	if id:find("%d+") then
+		thread = lua_thread.create(function()
+			sampSendChat(string.format("/me достал%s из мед. сумки рабочий планшет",chsex("","а")))
+			wait(1000)
+			sampSendChat(string.format("/me наш%s мед. карту №%s в онлайн-архиве",chsex("ёл","ла"),id))
+			wait(1000)
+			sampSendChat(string.format("/me сделал%s запрос на изменение даты осмотра в мед. карте",chsex("","а")))
+			wait(100)
+			sampSendChat("/medcard "..id.." 3 3 1000")			
+			wait(1000)
+				sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Нажмите на  {23E64A}Enter{FFFFFF} для продолжения.", 0xEE4848)
+				addOneOffSound(0, 0, 0, 1058)
+				local len = renderGetFontDrawTextLength(font, "{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить")
+				while true do
+					wait(0)
+					renderFontDrawText(font, "Фаст карта: {8ABCFA}Оплата\n{FFFFFF}[{67E56F}Enter{FFFFFF}] - Продолжить", sx-len-10, sy-50, 0xFFFFFFFF)
+					if isKeyJustPressed(VK_RETURN) and not sampIsChatInputActive() and not sampIsDialogActive() then break end
+				end						
+			wait(1000)
+			sampSendChat(string.format("/do Новая дата обновления медкарты №%s: %s %s 20%sг.",id,tostring(tonumber(os.date("%d"))),tostring(month[tonumber(os.date("%m"))]),tostring(tonumber(os.date("%y")))))
+			wait(1000)
+			sampSendChat(string.format("/me убрал%s рабочий планшет в сумку",chsex("","а"),id))
+		end)
+	else
+	sampAddChatMessage("{FFFFFF}[{EE4848}MedicalHelper{FFFFFF}]: Используйте команду /fmc [id игрока].", 0xEE4848)
 	end
 end
 function funCMD.lecFast(id)
